@@ -2,25 +2,63 @@ from flask import Flask, render_template, request, jsonify
 from apscheduler.schedulers.background import BackgroundScheduler
 # import RPi.GPIO as GPIO
 from datetime import datetime, timedelta
+import configparser
+import os
+from time import sleep
 
 app = Flask(__name__)
-
-# GPIO setup
-# GPIO.setmode(GPIO.BCM)
-# GPIO.setup(17, GPIO.OUT)  # Example GPIO pin for sprinkler 1
 
 # Shared state
 sprinkler_status = {"status": "off"}
 
+# Loads configuration file
+def load_config(filename='config'):
+  config = configparser.RawConfigParser()
+  this_dir = os.path.abspath(os.path.dirname(__file__))
+  config.read(this_dir + '/' + filename)
+  if config.has_section('SprinklerConfig'):
+      return {name:val for (name, val) in config.items('SprinklerConfig')}
+  else:
+      print('Unable to read file %s with section SprinklerConfig' % filename)
+      print('Make sure a file named config lies in the directory %s' % this_dir)
+      raise Exception('Unable to find config file')
+config = load_config()
+session_logs = []
+
+# GPIO setup
+# GPIO.setmode(GPIO.BCM)
+# GPIO.setup(int(config['gpio_starter']), GPIO.OUT)  # Example GPIO pin for sprinkler 1
+
+
+
 def turn_on_sprinkler():
-    # GPIO.output(17, GPIO.HIGH)
+    # GPIO.output(int(config['gpio_starter']), GPIO.HIGH)
     sprinkler_status["status"] = "on"
     print(f"Sprinkler turned on at {datetime.now()}")
+    with open(config['log_file'],'a') as log_file:
+        try:
+            msg = f'{datetime.now()}: Starting sprinkler\n'
+            log_file.write(msg)
+            session_logs.append(msg)
+        except Exception as ex:
+            msg = f'{datetime.now()}: An error has occurred: {ex.message}\n'
+            log_file.write(msg)
+            session_logs.append(msg)  
 
 def turn_off_sprinkler():
-    # GPIO.output(17, GPIO.LOW)
+    # GPIO.output(int(config['gpio_starter']), GPIO.LOW)
     sprinkler_status["status"] = "off"
     print(f"Sprinkler turned off at {datetime.now()}")
+    with open(config['log_file'],'a') as log_file:
+        try:
+            msg = f'{datetime.now()}: Stopping sprinkler\n'
+            log_file.write(msg)
+            session_logs.append(msg)
+        except Exception as ex:
+            msg = f'{datetime.now()}: An error has occurred: {ex.message}\n'
+            session_logs.append(msg)  
+            log_file.write(msg)
+
 
 def schedule_sprinklers():
     today = datetime.today()
@@ -44,6 +82,10 @@ def control_sprinkler():
         return jsonify({"status": "Sprinkler turned off"})
     else:
         return jsonify({"status": "Invalid action"}), 400
+    
+@app.route('/logs', methods=['GET'])
+def get_logs():
+    return jsonify(session_logs)
 
 @app.route('/status', methods=['GET'])
 def get_status():

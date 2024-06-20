@@ -15,6 +15,17 @@
                         document.getElementById("status").innerText = "Sprinkler is " + data.status;
                     })
                     .catch(error => console.error('Error:', error));
+                // fetch logs
+                fetch('/logs')
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById("logs").innerHTML = "Logs";
+                        data.logs.forEach(log => {
+                            const li = document.createElement("li");
+                            li.innerText = log;
+                            document.getElementById("logs").appendChild(li);
+                        });
+                    })
             }
         });
 
@@ -40,5 +51,11 @@
     <p id="status">Sprinkler is ...</p>
     <button onclick="controlSprinkler('on')">Turn On</button>
     <button onclick="controlSprinkler('off')">Turn Off</button>
+    <!-- Add logs -->
+    <h2 id="logs">Logs</h2>
+    <ul>
+        {% for log in logs %}
+            <li>{{ log }}</li>
+        {% endfor %}
 </body>
 </html>
