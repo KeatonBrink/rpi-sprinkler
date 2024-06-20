@@ -1,0 +1,62 @@
+from flask import Flask, render_template, request, jsonify
+from apscheduler.schedulers.background import BackgroundScheduler
+# import RPi.GPIO as GPIO
+from datetime import datetime, timedelta
+
+app = Flask(__name__)
+
+# GPIO setup
+# GPIO.setmode(GPIO.BCM)
+# GPIO.setup(17, GPIO.OUT)  # Example GPIO pin for sprinkler 1
+
+# Shared state
+sprinkler_status = {"status": "off"}
+
+def turn_on_sprinkler():
+    # GPIO.output(17, GPIO.HIGH)
+    sprinkler_status["status"] = "on"
+    print(f"Sprinkler turned on at {datetime.now()}")
+
+def turn_off_sprinkler():
+    # GPIO.output(17, GPIO.LOW)
+    sprinkler_status["status"] = "off"
+    print(f"Sprinkler turned off at {datetime.now()}")
+
+def schedule_sprinklers():
+    today = datetime.today()
+    if today.day % 2 == 1 or today.weekday() == 5:  # Odd days and Saturdays
+        turn_on_sprinkler()
+        # Schedule to turn off after 1 hour
+        scheduler.add_job(turn_off_sprinkler, 'date', run_date=datetime.now() + timedelta(hours=1))
+
+@app.route('/')
+def index():
+    return render_template('index.html', status=sprinkler_status["status"])
+
+@app.route('/sprinkler', methods=['POST'])
+def control_sprinkler():
+    action = request.json.get('action')
+    if action == 'on':
+        turn_on_sprinkler()
+        return jsonify({"status": "Sprinkler turned on"})
+    elif action == 'off':
+        turn_off_sprinkler()
+        return jsonify({"status": "Sprinkler turned off"})
+    else:
+        return jsonify({"status": "Invalid action"}), 400
+
+@app.route('/status', methods=['GET'])
+def get_status():
+    return jsonify(sprinkler_status)
+
+if __name__ == '__main__':
+    # Setup the scheduler
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(schedule_sprinklers, 'cron', hour=6)  # Run daily at 6 AM
+    scheduler.start()
+    
+    # Start the Flask server
+    try:
+        app.run(host='0.0.0.0', port=5000)
+    except (KeyboardInterrupt, SystemExit):
+        scheduler.shutdown()

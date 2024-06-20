@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sprinkler Control</title>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            updateStatus();
+
+            setInterval(updateStatus, 5000); // Update status every 5 seconds
+
+            function updateStatus() {
+                fetch('/status')
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById("status").innerText = "Sprinkler is " + data.status;
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+        });
+
+        function controlSprinkler(action) {
+            fetch('/sprinkler', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ action: action }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.status);
+                updateStatus(); // Update status immediately after action
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+</head>
+<body>
+    <h1>Sprinkler Control</h1>
+    <p id="status">Sprinkler is ...</p>
+    <button onclick="controlSprinkler('on')">Turn On</button>
+    <button onclick="controlSprinkler('off')">Turn Off</button>
+</body>
+</html>
