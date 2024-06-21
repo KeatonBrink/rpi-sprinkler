@@ -13,4 +13,5 @@ gpio_led1 = 27
 
 ## Choose location and name of log file
 
-log_file = /home/pi/sprinkler.log
+#log_file = /home/pi/sprinkler.log
+log_file = sprinkler.log

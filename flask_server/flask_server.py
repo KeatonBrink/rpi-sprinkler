@@ -69,7 +69,7 @@ def schedule_sprinklers():
 
 @app.route('/')
 def index():
-    return render_template('index.html', status=sprinkler_status["status"])
+    return render_template('index.html', status=sprinkler_status["status"], logs=session_logs[::-1])
 
 @app.route('/sprinkler', methods=['POST'])
 def control_sprinkler():
@@ -85,7 +85,7 @@ def control_sprinkler():
     
 @app.route('/logs', methods=['GET'])
 def get_logs():
-    return jsonify(session_logs)
+    return jsonify(session_logs[::-1])
 
 @app.route('/status', methods=['GET'])
 def get_status():

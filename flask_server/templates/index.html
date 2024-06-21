@@ -8,7 +8,9 @@
 
             setInterval(updateStatus, 5000); // Update status every 5 seconds
 
-            function updateStatus() {
+        });
+
+        function updateStatus() {
                 fetch('/status')
                     .then(response => response.json())
                     .then(data => {
@@ -19,15 +21,15 @@
                 fetch('/logs')
                     .then(response => response.json())
                     .then(data => {
-                        document.getElementById("logs").innerHTML = "Logs";
-                        data.logs.forEach(log => {
-                            const li = document.createElement("li");
-                            li.innerText = log;
-                            document.getElementById("logs").appendChild(li);
-                        });
-                    })
+                        let logsList = document.getElementById("logs");
+                        logsList.innerHTML = "";
+                        data.forEach(log => {
+                            let listItem = document.createElement("li");
+                            listItem.textContent = log;
+                            logsList.appendChild(listItem);
+                        })
+                    });
             }
-        });
 
         function controlSprinkler(action) {
             fetch('/sprinkler', {
