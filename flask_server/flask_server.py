@@ -65,7 +65,7 @@ def schedule_sprinklers():
     if today.day % 2 == 1 or today.weekday() == 5:  # Odd days and Saturdays
         turn_on_sprinkler()
         # Schedule to turn off after 1 hour
-        scheduler.add_job(turn_off_sprinkler, 'date', run_date=datetime.now() + timedelta(hours=1))
+        scheduler.add_job(turn_off_sprinkler, 'date', run_date=datetime.now() + (timedelta(hours=1) * config['water_duration']))
 
 @app.route('/')
 def index():
@@ -103,7 +103,7 @@ def get_records():
 if __name__ == '__main__':
     # Setup the scheduler
     scheduler = BackgroundScheduler()
-    scheduler.add_job(schedule_sprinklers, 'cron', hour=6)  # Run daily at 6 AM
+    scheduler.add_job(schedule_sprinklers, 'cron', hour=config['start_time'])  # Run daily at 6 AM
     scheduler.start()
     
     # Start the Flask server
