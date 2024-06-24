@@ -32,11 +32,11 @@ session_logs = []
 
 
 def turn_on_sprinkler():
-    # GPIO.output(int(config['gpio_starter']), GPIO.HIGH)
-    sprinkler_status["status"] = "on"
-    print(f"Sprinkler turned on at {datetime.now()}")
     with open(config['log_file'],'a') as log_file:
         try:
+            # GPIO.output(int(config['gpio_starter']), GPIO.HIGH)
+            sprinkler_status["status"] = "on"
+            print(f"Sprinkler turned on at {datetime.now()}")
             msg = f'{datetime.now()}: Starting sprinkler\n'
             log_file.write(msg)
             session_logs.append(msg)
@@ -46,11 +46,11 @@ def turn_on_sprinkler():
             session_logs.append(msg)  
 
 def turn_off_sprinkler():
-    # GPIO.output(int(config['gpio_starter']), GPIO.LOW)
-    sprinkler_status["status"] = "off"
-    print(f"Sprinkler turned off at {datetime.now()}")
     with open(config['log_file'],'a') as log_file:
         try:
+            # GPIO.output(int(config['gpio_starter']), GPIO.LOW)
+            sprinkler_status["status"] = "off"
+            print(f"Sprinkler turned off at {datetime.now()}")
             msg = f'{datetime.now()}: Stopping sprinkler\n'
             log_file.write(msg)
             session_logs.append(msg)
