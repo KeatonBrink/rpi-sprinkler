@@ -71,6 +71,10 @@ def schedule_sprinklers():
 def index():
     return render_template('index.html', status=sprinkler_status["status"], logs=session_logs[::-1])
 
+@app.route('/template/style.css')
+def css():
+    return render_template('style.css')
+
 @app.route('/sprinkler', methods=['POST'])
 def control_sprinkler():
     action = request.json.get('action')
@@ -90,6 +94,11 @@ def get_logs():
 @app.route('/status', methods=['GET'])
 def get_status():
     return jsonify(sprinkler_status)
+
+@app.route("/all_records", methods=['GET'])
+def get_records():
+    with open(config['log_file'],'r') as log_file:
+        return jsonify(log_file.readlines()[::-1])
 
 if __name__ == '__main__':
     # Setup the scheduler
