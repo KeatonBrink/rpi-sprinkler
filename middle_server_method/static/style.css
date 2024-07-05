@@ -1,0 +1,14 @@
+/* Should be centered and vertical */
+#top_of_page {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+
+#dual_logs {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}

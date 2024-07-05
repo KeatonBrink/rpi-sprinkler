@@ -1,0 +1,25 @@
+# This is a configuration file for setting up the sprinkler schedule.
+
+[SprinklerConfig] # don't edit this line
+
+####
+
+## GPIO pins to control the sprinkler and the status LEDs
+
+gpio_pin = 17
+gpio_led1 = 27
+
+####
+
+## Designate timing
+
+# 24 hr clock
+start_time = 6
+
+# Water duration (hours)
+water_duration = 1
+
+## Choose location and name of log file
+
+#log_file = /home/pi/sprinkler.log
+log_file = sprinkler.log

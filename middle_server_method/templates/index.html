@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Sprinkler Control</title>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        updateStatus();
+
+        setInterval(updateStatus, 5000); // Update status every 5 seconds
+      });
+
+      function updateStatus() {
+        fetch("/status")
+          .then((response) => response.json())
+          .then((data) => {
+            document.getElementById("status").innerText =
+              "Sprinkler is " + data.status;
+          })
+          .catch((error) => console.error("Error:", error));
+        // fetch logs
+        fetch("/logs")
+          .then((response) => response.json())
+          .then((data) => {
+            let logsList = document.getElementById("logs");
+            logsList.innerHTML = "";
+            data.forEach((log) => {
+              let listItem = document.createElement("li");
+              listItem.textContent = log;
+              logsList.appendChild(listItem);
+            });
+          });
+      }
+
+      function controlSprinkler(action) {
+        fetch("/sprinkler", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ action: action }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            alert(data.status);
+            updateStatus(); // Update status immediately after action
+          })
+          .catch((error) => console.error("Error:", error));
+      }
+
+      function getAllRecords() {
+        fetch("/all_records", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            let allRecordsList = document.getElementById("all_records");
+            allRecordsList.innerHTML = "";
+            data.forEach((record) => {
+              let listItem = document.createElement("li");
+              listItem.textContent = record;
+              allRecordsList.appendChild(listItem);
+            });
+          })
+          .catch((error) => console.error("Error:", error));
+      }
+    </script>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <div id="top_of_page">
+      <h1>Sprinkler Control</h1>
+      <p id="status">Sprinkler is ...</p>
+      <button onclick="controlSprinkler('on')">Turn On</button>
+      <button onclick="controlSprinkler('off')">Turn Off</button>
+      <button onclick="getAllRecords()">Get All Records</button>
+    </div>
+    <!-- Set up one set of logs that get updated every 5 seconds and another that appears when getAllRecords is clicked.  These will be side by side -->
+    <div id="dual_logs">
+      <div>
+        <!-- Add logs -->
+        <h2 id="logs">Logs</h2>
+        <ul>
+          {% for log in logs %}
+          <li>{{ log }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div>
+        <!-- Add all records -->
+        <h2 id="all_records">All Records</h2>
+        <ul>
+          {% for record in records %}
+          <li>{{ record }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </body>
+</html>
