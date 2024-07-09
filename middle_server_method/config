@@ -19,6 +19,12 @@ start_time = 6
 # Water duration (hours)
 water_duration = 1
 
+# Server update frequency (Seconds)
+polling_frequency = 60
+
+## Server Address
+server_address = localhost:8080
+
 ## Choose location and name of log file
 
 #log_file = /home/pi/sprinkler.log
