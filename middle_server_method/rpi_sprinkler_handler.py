@@ -4,6 +4,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime, timedelta
 import configparser
 import os
+import requests
 from time import sleep
 
 # Shared state
@@ -76,10 +77,14 @@ def get_update_from_server():
     # The response should be stored in the sprinkler_status variable
     # sprinkler_status = {"status": "on"}
     # Http request to the server
-    server_url = config['server_url']
-    # Here it the server code to try and sync up with the server
-    # func rpiPolling(w http.ResponseWriter, r *http.Request) {
-	# // Needs to get the state from the request, and then return an updated state
+    server_url = config['server_address']
+
+    # Here is the go code:
+    # type Request struct {
+	# 	IsSprinklerOn bool `json:"isSprinklerOn"`
+	# }
+
+	# var request Request
 
 	# err := json.NewDecoder(r.Body).Decode(&request)
 	# if err != nil {
@@ -104,7 +109,23 @@ def get_update_from_server():
 	# w.WriteHeader(http.StatusOK)
 	# w.Write(userRequestJson)
 	# userRequest.SetSprinkler = 0
-# }
+
+    # Here is the python code:
+    # First, send the expected json for the current status of the sprinkler
+    response = requests.get(server_url+'/rpi-polling', {'isSprinklerOn': sprinkler_status["status"]})
+
+
+    # Then, get the response from the server
+    response = response.json()
+    print(response)
+    # If the response is different from the current status, change the status of the sprinkler
+    if response['isSprinklerOn'] == 1:
+        turn_on_sprinkler()
+    elif response['isSprinklerOn'] == 2:
+        turn_off_sprinkler()
+
+    print("End of get_update_from_server")
+    
 
 if __name__ == '__main__':
     # Setup the scheduler

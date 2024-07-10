@@ -15,13 +15,12 @@ type State struct {
 }
 
 type UserRequest struct {
-	SetSprinkler int 'json:"setSprinkler"'
+	SetSprinkler int `json:"setSprinkler"`
 }
 
 var s State
 
 var userRequest UserRequest
-userRequest = UserRequest{SetSprinkler: 0}
 
 // type page struct {
 // 	Title string
@@ -48,6 +47,12 @@ func statusHandler(w http.ResponseWriter, r *http.Request) {
 
 func rpiPolling(w http.ResponseWriter, r *http.Request) {
 	// Needs to get the state from the request, and then return an updated state
+
+	type Request struct {
+		IsSprinklerOn bool `json:"isSprinklerOn"`
+	}
+
+	var request Request
 
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
@@ -87,12 +92,14 @@ func main() {
 
 	s = State{isSprinklerOn: false, currentLogs: []string{}}
 
+	userRequest = UserRequest{SetSprinkler: 0}
+
 	fs := http.FileServer(http.Dir("./static"))
 	http.Handle("/", fs)
 
 	http.HandleFunc("/status", statusHandler)
 
-	http.HandleFunc("/rpi-polling")
+	http.HandleFunc("/rpi-polling", rpiPolling)
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
