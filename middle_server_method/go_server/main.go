@@ -15,7 +15,7 @@ type State struct {
 }
 
 type UserRequest struct {
-	SetSprinkler unsigned int 'json:"setSprinkler"'
+	SetSprinkler int 'json:"setSprinkler"'
 }
 
 var s State
