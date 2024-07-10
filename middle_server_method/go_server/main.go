@@ -30,7 +30,7 @@ userRequest = UserRequest{SetSprinkler: 0}
 
 func statusHandler(w http.ResponseWriter, r *http.Request) {
 	type Status struct {
-		IsSprinklerOn bool `json:"isSprinklerOn"`
+		IsSprinklerOn bool `json:"status"`
 	}
 
 	status := Status{IsSprinklerOn: s.isSprinklerOn}
