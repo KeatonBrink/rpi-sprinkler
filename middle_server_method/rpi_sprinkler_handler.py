@@ -69,6 +69,7 @@ def schedule_sprinklers():
         scheduler.add_job(turn_off_sprinkler, 'date', run_date=datetime.now() + (timedelta(hours=1) * config['water_duration']))
 
 def get_update_from_server():
+    print("Start get update from server")
     # Get the latest status from the server
     # This can be done using a GET request to the server
     # The server should return the status of the sprinkler
@@ -112,9 +113,16 @@ def get_update_from_server():
 
     # Here is the python code:
     # First, send the expected json for the current status of the sprinkler
-    response = requests.get(server_url+'/rpi-polling', {'isSprinklerOn': sprinkler_status["status"]})
+    print(sprinkler_status["status"] == "on")
+    response = requests.get(server_url+'/rpi-polling', params={'sprinklerStatus': sprinkler_status["status"]})
 
+    if response.status_code != 200:
+        print("Error getting response from server")
+        print(response.status_code)
+        print(response.text)
+        return
 
+    print(response)
     # Then, get the response from the server
     response = response.json()
     print(response)
@@ -137,7 +145,7 @@ if __name__ == '__main__':
     try:
         while True:
             get_update_from_server()
-            sleep(config['polling_interval'])
+            sleep(int(config['polling_frequency']))
             
     except (KeyboardInterrupt, SystemExit):
         scheduler.shutdown()

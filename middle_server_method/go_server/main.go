@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -46,10 +47,10 @@ func statusHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func rpiPolling(w http.ResponseWriter, r *http.Request) {
-	// Needs to get the state from the request, and then return an updated state
+	fmt.Println("Start rpiPolling")
 
 	type Request struct {
-		IsSprinklerOn bool `json:"isSprinklerOn"`
+		sprinklerStatus string `json:"sprinklerStatus"`
 	}
 
 	var request Request
@@ -61,7 +62,11 @@ func rpiPolling(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	s.isSprinklerOn = request.IsSprinklerOn
+	if request.sprinklerStatus == "on" {
+		s.isSprinklerOn = true
+	} else {
+		s.isSprinklerOn = false
+	}
 
 	// The request will contain
 	// 0 if nothing should change
@@ -84,11 +89,11 @@ func rpiPolling(w http.ResponseWriter, r *http.Request) {
 // }
 
 func main() {
-	// err := gologger.InitGoLogger(true, "output.log")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	go gologger.EmptyMessageQueue()
+	err := gologger.InitGoLogger(false, "output.log")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer gologger.EmptyMessageQueue()
 
 	s = State{isSprinklerOn: false, currentLogs: []string{}}
 
