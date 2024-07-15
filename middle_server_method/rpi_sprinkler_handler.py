@@ -6,6 +6,7 @@ import configparser
 import os
 import requests
 from time import sleep
+import json
 
 # Shared state
 sprinkler_status = {"status": "off"}
@@ -113,24 +114,30 @@ def get_update_from_server():
 
     # Here is the python code:
     # First, send the expected json for the current status of the sprinkler
-    print(sprinkler_status["status"] == "on")
-    response = requests.get(server_url+'/rpi-polling', params={'sprinklerStatus': sprinkler_status["status"]})
+    try:
+        headers = {'Content-Type': 'application/json'}
+        data = json.dumps({'isSprinklerOn': sprinkler_status["status"]})
+        response = requests.post(server_url + '/rpi-polling', headers=headers, data=data)
 
-    if response.status_code != 200:
-        print("Error getting response from server")
-        print(response.status_code)
-        print(response.text)
-        return
+        if response.status_code != 200:
+            print("Error getting response from server")
+            print(response.status_code)
+            print(response.text)
+            return
 
-    print(response)
-    # Then, get the response from the server
-    response = response.json()
-    print(response)
-    # If the response is different from the current status, change the status of the sprinkler
-    if response['isSprinklerOn'] == 1:
-        turn_on_sprinkler()
-    elif response['isSprinklerOn'] == 2:
-        turn_off_sprinkler()
+        print(response)
+        # Then, get the response from the server
+        response = response.json()
+        print(response)
+        # If the response is different from the current status, change the status of the sprinkler
+        if response['setSprinkler'] == 1:
+            turn_on_sprinkler()
+        elif response['setSprinkler'] == 2:
+            turn_off_sprinkler()
+        elif response['setSprinkler'] != 0:
+            print(f"Error getting response {response['setSprinkler']}")
+    except Exception as e:
+        print(f"Error getting response from server: {e}")
 
     print("End of get_update_from_server")
     
@@ -141,7 +148,6 @@ if __name__ == '__main__':
     scheduler.add_job(schedule_sprinklers, 'cron', hour=config['start_time'])  # Run daily at 6 AM
     scheduler.start()
     
-    # Start the Flask server
     try:
         while True:
             get_update_from_server()

@@ -82,6 +82,7 @@ func rpiPolling(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write(userRequestJson)
 	userRequest.SetSprinkler = 0
+	fmt.Println("End of rpiPolling")
 }
 
 // func handler(w http.ResponseWriter, r *http.Request) {

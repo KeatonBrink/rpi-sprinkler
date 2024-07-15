@@ -20,7 +20,7 @@ start_time = 6
 water_duration = 1
 
 # Server update frequency (Seconds)
-polling_frequency = 60
+polling_frequency = 5
 
 ## Server Address
 server_address = http://localhost:8080
