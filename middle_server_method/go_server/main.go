@@ -85,6 +85,27 @@ func rpiPolling(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("End of rpiPolling")
 }
 
+func rpiLogReport(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Start rpiLogReport")
+
+	type Request struct {
+		log string `json:"logs"`
+	}
+
+	var request Request
+
+	err := json.NewDecoder(r.Body).Decode(&request)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		gologger.QueueMessage("Error decoding request")
+		return
+	}
+
+	s.currentLogs = append(s.currentLogs, request.log)
+
+	fmt.Println("End of rpiLogReport")
+}
+
 // func handler(w http.ResponseWriter, r *http.Request) {
 // 	fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
 // }

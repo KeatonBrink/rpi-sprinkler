@@ -81,39 +81,6 @@ def get_update_from_server():
     # Http request to the server
     server_url = config['server_address']
 
-    # Here is the go code:
-    # type Request struct {
-	# 	IsSprinklerOn bool `json:"isSprinklerOn"`
-	# }
-
-	# var request Request
-
-	# err := json.NewDecoder(r.Body).Decode(&request)
-	# if err != nil {
-	# 	http.Error(w, err.Error(), http.StatusBadRequest)
-	# 	gologger.QueueMessage("Error decoding request")
-	# 	return
-	# }
-
-	# s.isSprinklerOn = request.IsSprinklerOn
-
-	# // The request will contain
-	# // 0 if nothing should change
-	# // 1 if the sprinkler should be on
-	# // 2 if the sprinkler should be off
-	# userRequestJson, err := json.Marshal(userRequest)
-	# if err != nil {
-	# 	http.Error(w, err.Error(), http.StatusInternalServerError)
-	# 	gologger.QueueMessage("Error marshalling user request to JSON")
-	# 	return
-	# }
-	# w.Header().Set("Content-Type", "application/json")
-	# w.WriteHeader(http.StatusOK)
-	# w.Write(userRequestJson)
-	# userRequest.SetSprinkler = 0
-
-    # Here is the python code:
-    # First, send the expected json for the current status of the sprinkler
     try:
         headers = {'Content-Type': 'application/json'}
         data = json.dumps({'isSprinklerOn': sprinkler_status["status"]})
@@ -140,6 +107,33 @@ def get_update_from_server():
         print(f"Error getting response from server: {e}")
 
     print("End of get_update_from_server")
+
+def post_Logs():
+    # Post the logs to the server
+    # This can be done using a POST request to the server
+    # The logs should be sent as a JSON object with the key "logs"
+    # Example request: {"logs": ["Log 1", "Log 2", "Log 3"]}
+    # The server should respond with a success message
+    # Example response: {"message": "Logs received"}
+    # The logs should be cleared after being sent
+    server_url = config['server_address']
+
+    try:
+        headers = {'Content-Type': 'application/json'}
+        data = json.dumps({'logs': session_logs})
+        response = requests.post(server_url + '/rpi-logs', headers=headers, data=data)
+
+        if response.status_code != 200:
+            print("Error posting logs to server")
+            print(response.status_code)
+            print(response.text)
+            return
+
+        print(response)
+        # Then, clear the logs
+        session_logs.clear()
+    except Exception as e:
+        print(f"Error posting logs to server: {e}")
     
 
 if __name__ == '__main__':
