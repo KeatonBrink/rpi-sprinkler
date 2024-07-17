@@ -12,12 +12,14 @@ import (
 type State struct {
 	// some state
 	isSprinklerOn bool
-	currentLogs   []string
+	rpiLogs       []string
 }
 
 type UserRequest struct {
 	SetSprinkler int `json:"setSprinkler"`
 }
+
+var rpiLogs []string
 
 var s State
 
@@ -88,22 +90,22 @@ func rpiPolling(w http.ResponseWriter, r *http.Request) {
 func rpiLogReport(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Start rpiLogReport")
 
-	type Request struct {
-		log string `json:"logs"`
-	}
+	var logs []string
 
-	var request Request
-
-	err := json.NewDecoder(r.Body).Decode(&request)
+	err := json.NewDecoder(r.Body).Decode(&logs)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
-		gologger.QueueMessage("Error decoding request")
+		fmt.Println("Error decoding request:", err)
 		return
 	}
 
-	s.currentLogs = append(s.currentLogs, request.log)
+	s.rpiLogs = logs
 
+	fmt.Println("Received logs:", s.rpiLogs)
 	fmt.Println("End of rpiLogReport")
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Logs received successfully"))
 }
 
 // func handler(w http.ResponseWriter, r *http.Request) {
@@ -117,7 +119,7 @@ func main() {
 	}
 	defer gologger.EmptyMessageQueue()
 
-	s = State{isSprinklerOn: false, currentLogs: []string{}}
+	s = State{isSprinklerOn: false, rpiLogs: []string{}}
 
 	userRequest = UserRequest{SetSprinkler: 0}
 
@@ -127,6 +129,8 @@ func main() {
 	http.HandleFunc("/status", statusHandler)
 
 	http.HandleFunc("/rpi-polling", rpiPolling)
+
+	http.HandleFunc("/rpi-logs", rpiLogReport)
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

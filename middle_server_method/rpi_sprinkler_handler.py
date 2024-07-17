@@ -108,7 +108,7 @@ def get_update_from_server():
 
     print("End of get_update_from_server")
 
-def post_Logs():
+def post_logs():
     # Post the logs to the server
     # This can be done using a POST request to the server
     # The logs should be sent as a JSON object with the key "logs"
@@ -120,7 +120,7 @@ def post_Logs():
 
     try:
         headers = {'Content-Type': 'application/json'}
-        data = json.dumps({'logs': session_logs})
+        data = json.dumps(session_logs)
         response = requests.post(server_url + '/rpi-logs', headers=headers, data=data)
 
         if response.status_code != 200:
@@ -129,9 +129,6 @@ def post_Logs():
             print(response.text)
             return
 
-        print(response)
-        # Then, clear the logs
-        session_logs.clear()
     except Exception as e:
         print(f"Error posting logs to server: {e}")
     
@@ -145,6 +142,7 @@ if __name__ == '__main__':
     try:
         while True:
             get_update_from_server()
+            post_logs()
             sleep(int(config['polling_frequency']))
             
     except (KeyboardInterrupt, SystemExit):
