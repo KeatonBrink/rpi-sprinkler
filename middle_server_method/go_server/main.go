@@ -108,6 +108,30 @@ func rpiLogReport(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Logs received successfully"))
 }
 
+func userSprinklerRequest(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Start userSprinklerRequest")
+
+	var oneResquest string
+
+	err := json.NewDecoder(r.Body).Decode(&oneResquest)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		fmt.Println("Error decoding request:", err)
+		return
+	}
+
+	if oneResquest == "on" {
+		userRequest.SetSprinkler = 1
+	} else {
+		userRequest.SetSprinkler = 2
+	}
+
+	fmt.Println("Received user request:", userRequest)
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("User request received successfully"))
+}
+
 // func handler(w http.ResponseWriter, r *http.Request) {
 // 	fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
 // }
