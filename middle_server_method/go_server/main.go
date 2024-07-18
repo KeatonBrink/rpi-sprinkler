@@ -128,8 +128,13 @@ func userSprinklerRequest(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println("Received user request:", userRequest)
 
+	response := map[string]string{
+		"status": "User request received successfully",
+	}
+
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("User request received successfully"))
+	json.NewEncoder(w).Encode(response)
 }
 
 // func handler(w http.ResponseWriter, r *http.Request) {
@@ -155,6 +160,8 @@ func main() {
 	http.HandleFunc("/rpi-polling", rpiPolling)
 
 	http.HandleFunc("/rpi-logs", rpiLogReport)
+
+	http.HandleFunc("/sprinkler", userSprinklerRequest)
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
