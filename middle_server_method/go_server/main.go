@@ -49,10 +49,9 @@ func statusHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func rpiPolling(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Start rpiPolling")
 
 	type Request struct {
-		sprinklerStatus string `json:"sprinklerStatus"`
+		sprinklerStatus string `json:"isSprinklerOn"`
 	}
 
 	var request Request
@@ -70,6 +69,8 @@ func rpiPolling(w http.ResponseWriter, r *http.Request) {
 		s.isSprinklerOn = false
 	}
 
+	fmt.Println("Received sprinkler status:", request.sprinklerStatus)
+
 	// The request will contain
 	// 0 if nothing should change
 	// 1 if the sprinkler should be on
@@ -84,7 +85,6 @@ func rpiPolling(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write(userRequestJson)
 	userRequest.SetSprinkler = 0
-	fmt.Println("End of rpiPolling")
 }
 
 func rpiLogReport(w http.ResponseWriter, r *http.Request) {

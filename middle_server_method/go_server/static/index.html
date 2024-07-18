@@ -15,6 +15,7 @@
           .then((data) => {
             document.getElementById("status").innerText =
               "Sprinkler is " + data.status;
+            console.log(data.status);
           })
           .catch((error) => console.error("Error:", error));
         // fetch logs

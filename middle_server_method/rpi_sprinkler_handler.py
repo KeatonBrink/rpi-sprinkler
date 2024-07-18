@@ -84,7 +84,10 @@ def get_update_from_server():
     try:
         headers = {'Content-Type': 'application/json'}
         data = json.dumps({'isSprinklerOn': sprinkler_status["status"]})
+        print(data)
         response = requests.post(server_url + '/rpi-polling', headers=headers, data=data)
+
+        print("Sprinkler status: ", sprinkler_status)
 
         if response.status_code != 200:
             print("Error getting response from server")
