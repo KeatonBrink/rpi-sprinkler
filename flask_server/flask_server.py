@@ -1,12 +1,14 @@
 from flask import Flask, render_template, request, jsonify
 from apscheduler.schedulers.background import BackgroundScheduler
-# import RPi.GPIO as GPIO
+import RPi.GPIO as GPIO
 from datetime import datetime, timedelta
 import configparser
 import os
 from time import sleep
 
 app = Flask(__name__)
+
+production = False
 
 # Shared state
 sprinkler_status = {"status": "off"}
@@ -26,15 +28,17 @@ config = load_config()
 session_logs = []
 
 # GPIO setup
-# GPIO.setmode(GPIO.BCM)
-# GPIO.setup(int(config['gpio_starter']), GPIO.OUT)  # Example GPIO pin for sprinkler 1
+if production:
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(int(config['gpio_starter']), GPIO.OUT)  # Example GPIO pin for sprinkler 1
 
 
 
 def turn_on_sprinkler():
     with open(config['log_file'],'a') as log_file:
         try:
-            # GPIO.output(int(config['gpio_starter']), GPIO.HIGH)
+            if production:
+                GPIO.output(int(config['gpio_starter']), GPIO.HIGH)
             sprinkler_status["status"] = "on"
             print(f"Sprinkler turned on at {datetime.now()}")
             msg = f'{datetime.now()}: Starting sprinkler\n'
@@ -48,7 +52,8 @@ def turn_on_sprinkler():
 def turn_off_sprinkler():
     with open(config['log_file'],'a') as log_file:
         try:
-            # GPIO.output(int(config['gpio_starter']), GPIO.LOW)
+            if production:
+                GPIO.output(int(config['gpio_starter']), GPIO.LOW)
             sprinkler_status["status"] = "off"
             print(f"Sprinkler turned off at {datetime.now()}")
             msg = f'{datetime.now()}: Stopping sprinkler\n'
