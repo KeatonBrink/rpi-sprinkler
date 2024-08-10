@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 
@@ -51,25 +52,40 @@ func statusHandler(w http.ResponseWriter, r *http.Request) {
 func rpiPolling(w http.ResponseWriter, r *http.Request) {
 
 	type Request struct {
-		sprinklerStatus string `json:"isSprinklerOn"`
+		SprinklerStatus string `json:"SprinkerStatus"`
 	}
 
 	var request Request
 
-	err := json.NewDecoder(r.Body).Decode(&request)
+	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
-		gologger.QueueMessage("Error decoding request")
+		gologger.QueueMessage("Error reading request body")
 		return
 	}
 
-	if request.sprinklerStatus == "on" {
+	fmt.Println("Polling request body:", string(body))
+
+	err = json.Unmarshal(body, &request)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		gologger.QueueMessage("Error unmarshalling request body")
+		return
+	}
+
+	fmt.Println("UUUUUUUUUUUUUUUUUUUU")
+
+	fmt.Println("Polling request:", request)
+
+	fmt.Println("Polling request received:", request.SprinklerStatus)
+
+	if request.SprinklerStatus == "on" {
 		s.isSprinklerOn = true
 	} else {
 		s.isSprinklerOn = false
 	}
 
-	fmt.Println("Received sprinkler status:", request.sprinklerStatus)
+	fmt.Println("Received sprinkler status:", request.SprinklerStatus)
 
 	// The request will contain
 	// 0 if nothing should change

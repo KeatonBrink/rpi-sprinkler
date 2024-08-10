@@ -18,18 +18,18 @@
             console.log(data.status);
           })
           .catch((error) => console.error("Error:", error));
-        // fetch logs
-        fetch("/logs")
-          .then((response) => response.json())
-          .then((data) => {
-            let logsList = document.getElementById("logs");
-            logsList.innerHTML = "";
-            data.forEach((log) => {
-              let listItem = document.createElement("li");
-              listItem.textContent = log;
-              logsList.appendChild(listItem);
-            });
-          });
+        // // fetch logs
+        // fetch("/logs")
+        //   .then((response) => response.json())
+        //   .then((data) => {
+        //     let logsList = document.getElementById("logs");
+        //     logsList.innerHTML = "";
+        //     data.forEach((log) => {
+        //       let listItem = document.createElement("li");
+        //       listItem.textContent = log;
+        //       logsList.appendChild(listItem);
+        //     });
+        //   });
       }
 
       function controlSprinkler(action) {
@@ -49,23 +49,23 @@
       }
 
       function getAllRecords() {
-        fetch("/all_records", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            let allRecordsList = document.getElementById("all_records");
-            allRecordsList.innerHTML = "";
-            data.forEach((record) => {
-              let listItem = document.createElement("li");
-              listItem.textContent = record;
-              allRecordsList.appendChild(listItem);
-            });
-          })
-          .catch((error) => console.error("Error:", error));
+        // fetch("/all_records", {
+        //   method: "GET",
+        //   headers: {
+        //     "Content-Type": "application/json",
+        //   },
+        // })
+        //   .then((response) => response.json())
+        //   .then((data) => {
+        //     let allRecordsList = document.getElementById("all_records");
+        //     allRecordsList.innerHTML = "";
+        //     data.forEach((record) => {
+        //       let listItem = document.createElement("li");
+        //       listItem.textContent = record;
+        //       allRecordsList.appendChild(listItem);
+        //     });
+        //   })
+        //   .catch((error) => console.error("Error:", error));
       }
     </script>
     <link rel="stylesheet" href="/style.css" />

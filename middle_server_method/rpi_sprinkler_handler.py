@@ -79,13 +79,21 @@ def get_update_from_server():
     # The response should be stored in the sprinkler_status variable
     # sprinkler_status = {"status": "on"}
     # Http request to the server
-    server_url = config['server_address']
+    server_url = config['server_address'] + '/rpi-polling'
 
     try:
-        headers = {'Content-Type': 'application/json'}
-        data = json.dumps({'isSprinklerOn': sprinkler_status["status"]})
-        print(data)
-        response = requests.post(server_url + '/rpi-polling', headers=headers, data=data)
+        curStat = sprinkler_status["status"]
+
+        payload = {"SprinklerStatus": curStat}
+        headers = {"Content-Type": "application/json"}
+
+        response = requests.post(server_url, data=json.dumps(payload), headers=headers)
+        print(response.json())
+        # headers = {'Content-Type': 'application/json'}
+        # data = json.dumps({'SprinklerStatus': curStat})
+        
+        # print(data)
+        # response = requests.post(server_url + '/rpi-polling', headers=headers, data=data)
 
         print("Sprinkler status: ", sprinkler_status)
 
