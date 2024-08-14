@@ -5,6 +5,8 @@ from datetime import datetime, timedelta
 import configparser
 import os
 from time import sleep
+import argparse
+import sys
 
 app = Flask(__name__)
 
@@ -31,6 +33,7 @@ session_logs = []
 if production:
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(int(config['gpio_starter']), GPIO.OUT)  # Example GPIO pin for sprinkler 1
+
 
 
 
@@ -104,8 +107,15 @@ def get_status():
 def get_records():
     with open(config['log_file'],'r') as log_file:
         return jsonify(log_file.readlines()[::-1])
+    
+def parse_args():
+    parser = argparse.ArgumentParser(description='Start the Flask server')
+    parser.add_argument('--production', '-p', default=False, type=bool, help='Run the server in production mode')
+    return parser.parse_args(sys.argv[1:])
 
 if __name__ == '__main__':
+    args = parse_args()
+    production = args.production
     # Setup the scheduler
     scheduler = BackgroundScheduler()
     scheduler.add_job(schedule_sprinklers, 'cron', hour=config['start_time'])  # Run daily at 6 AM
