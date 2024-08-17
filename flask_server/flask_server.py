@@ -8,6 +8,11 @@ from time import sleep
 import argparse
 import sys
 
+#source ~/venv/bin/activate
+#python flask_server.py
+#localhost:5000  (In Browser)
+
+
 app = Flask(__name__)
 
 production = False
@@ -31,8 +36,9 @@ session_logs = []
 
 # GPIO setup
 if production:
+    print("Production setup")
     GPIO.setmode(GPIO.BCM)
-    GPIO.setup(int(config['gpio_starter']), GPIO.OUT)  # Example GPIO pin for sprinkler 1
+    GPIO.setup(int(config['gpio_pin']), GPIO.OUT)
 
 
 
@@ -41,7 +47,7 @@ def turn_on_sprinkler():
     with open(config['log_file'],'a') as log_file:
         try:
             if production:
-                GPIO.output(int(config['gpio_starter']), GPIO.HIGH)
+                GPIO.output(int(config['gpio_pin']), GPIO.HIGH)
             sprinkler_status["status"] = "on"
             print(f"Sprinkler turned on at {datetime.now()}")
             msg = f'{datetime.now()}: Starting sprinkler\n'
@@ -56,7 +62,7 @@ def turn_off_sprinkler():
     with open(config['log_file'],'a') as log_file:
         try:
             if production:
-                GPIO.output(int(config['gpio_starter']), GPIO.LOW)
+                GPIO.output(int(config['gpio_pin']), GPIO.LOW)
             sprinkler_status["status"] = "off"
             print(f"Sprinkler turned off at {datetime.now()}")
             msg = f'{datetime.now()}: Stopping sprinkler\n'
@@ -116,6 +122,11 @@ def parse_args():
 if __name__ == '__main__':
     args = parse_args()
     production = args.production
+    # GPIO setup
+    if production:
+        print("Production setup")
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(int(config['gpio_pin']), GPIO.OUT)
     # Setup the scheduler
     scheduler = BackgroundScheduler()
     scheduler.add_job(schedule_sprinklers, 'cron', hour=config['start_time'])  # Run daily at 6 AM
